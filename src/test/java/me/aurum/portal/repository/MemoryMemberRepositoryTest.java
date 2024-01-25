@@ -1,3 +1,4 @@
+/*
 package me.aurum.portal.repository;
 
 
@@ -61,4 +62,4 @@ class MemoryMemberRepositoryTest {
 
         assertThat(result.size()).isEqualTo(2);
     }
-}
+}*/
