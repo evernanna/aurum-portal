@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>LOGIN-SUCCESS</title>
+</head>
+<body>
+<p>
+<h1>로그인 성공했습니다.</h1>
+<div>
+  <span th:text="${account}"> account </span>
+  <button th:onclick="|location.href='@{/logout (loginType=${loginType})}'|">로그아웃</button>
+</div>
+</p>
+</body>
+</html>

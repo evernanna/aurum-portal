@@ -1,9 +1,7 @@
 package me.aurum.portal.member.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,6 +12,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Member {
 
     @Id
@@ -22,6 +21,7 @@ public class Member {
 
     @Column(unique = true)
     private String account;
+    @JsonIgnore
     private String password;
     private String name;
 
