@@ -14,14 +14,11 @@ public class HomeController {
 
     @GetMapping("/main")
     public String mainPage(Model model) {
-
         Member loginUser = getLoginUser();
-
         log.info(" loginUser :: {}", loginUser);
         model.addAttribute("loginUser", loginUser);
         model.addAttribute("account", loginUser.getAccount());
         model.addAttribute("loginType", "SESSION");
-
         return "main";
     }
 

@@ -2,18 +2,25 @@ package me.aurum.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.aurum.portal.member.repository.MemberRepository;
+import me.aurum.define.UserAuthority;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -22,8 +29,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @Slf4j
 public class SecurityConfig {
 
-    private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .antMatchers("/assets/**");
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -32,9 +42,11 @@ public class SecurityConfig {
 
         httpSecurity
                 .authorizeRequests()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/signup").permitAll()
+                .antMatchers("/login", "/signup").permitAll()
+                .antMatchers("/api/**").permitAll()
                 .antMatchers("/test").permitAll()
+                .antMatchers("/master/**").hasRole(UserAuthority.ROLE_MASTER.getCode())
+                .antMatchers("/admin/**").hasRole(UserAuthority.ROLE_ADMIN.getCode())
                 .anyRequest().authenticated();
 
         httpSecurity
@@ -43,7 +55,27 @@ public class SecurityConfig {
                 .passwordParameter("password")
                 .loginPage("/login")
                 .loginProcessingUrl("/login-proc")
-                .defaultSuccessUrl("/main")
+                .successHandler( // 로그인 성공 후 핸들러
+                        new AuthenticationSuccessHandler() {
+                            @Override
+                            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                                log.warn("Authentication: {}", authentication.getName());
+                                response.sendRedirect("/main");
+                            }
+
+                            @Override
+                            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
+                                AuthenticationSuccessHandler.super.onAuthenticationSuccess(request, response, chain, authentication);
+                            }
+                        })
+                .failureHandler( // 로그인 실패 후 핸들러
+                        new AuthenticationFailureHandler() { // 익명 객체 사용
+                            @Override
+                            public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+                                log.error("Exception: {}", exception.getMessage());
+                                response.sendRedirect("/login");
+                            }
+                        })
                 .and()
                 .logout();
 

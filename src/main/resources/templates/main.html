@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>LOGIN-SUCCESS</title>
+  <link href="/assets/dist/css/login/sign-in.css" rel="stylesheet">
 </head>
-<body>
+<body class="d-flex align-items-center py-4 bg-body-tertiary">
 <p>
-<h1>로그인 성공했습니다.</h1>
+<h1 th:text="${account}+'님께서 로그인에 성공했습니다.'">로그인에 성공했습니다.</h1>
 <div>
-  <span th:text="${account}"> account </span>
-  <button th:onclick="|location.href='@{/logout (loginType=${loginType})}'|">로그아웃</button>
+  <span th:text="${account}"></span>
+  <button th:onclick="|location.href='@{/logout}'|">로그아웃</button>
 </div>
 </p>
 </body>

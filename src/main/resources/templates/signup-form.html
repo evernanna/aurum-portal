@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +7,59 @@
 </head>
 <body>
 <h2>User Registration</h2>
-<form action="/member/signup" method="post">
-  <label for="username">Username:</label>
-  <input type="text" id="username" name="username" required>
+<div>
+  <label for="account">account:</label>
+  <input type="text" id="account" name="account" required>
   <br>
-  <label for="password">Password:</label>
+  <label for="name">password:</label>
+  <input type="text" id="name" name="name" required>
+  <br>
+  <label for="password">password:</label>
   <input type="password" id="password" name="password" required>
   <br>
-  <button type="submit">Register</button>
-</form>
+  <label for="email">email:</label>
+  <input type="email" id="email" name="email" required>
+  <br>
+  <label for="authority">authority:</label>
+  <input type="text" id="authority" name="authority">
+  <br>
+  <button id="signup-btn" th:onclick="register()">sign-up</button>
+</div>
 </body>
+
+<script>
+    function register() {
+        const account = document.getElementById("account").value;
+        const password = document.getElementById("password").value;
+        const email = document.getElementById("email").value;
+        const authority = document.getElementById("authority").value;
+
+        const data = {
+            'account': account,
+            'password': password,
+            'email': email,
+            'authority': authority,
+        }
+
+        fetch('/api/member/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(() => {
+                window.location.reload();
+            })
+            .catch(error => {
+                alert(JSON.stringify(error));
+            });
+    }
+</script>
 </html>

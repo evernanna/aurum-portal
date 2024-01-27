@@ -17,7 +17,7 @@ spring:
         use_sql_comments: true
         default_batch_fetch_size: 1000
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate  #create-drop, update, validate, none
 
 # jwt.secret.key
 jwt:
