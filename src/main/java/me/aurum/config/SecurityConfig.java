@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .antMatchers("/login", "/signup").permitAll()
                 .antMatchers("/api/**").permitAll()
                 .antMatchers("/test").permitAll()
+                .antMatchers("/aurum/**").permitAll()
                 .antMatchers("/master/**").hasRole(UserAuthority.ROLE_MASTER.getCode())
                 .antMatchers("/admin/**").hasRole(UserAuthority.ROLE_ADMIN.getCode())
                 .anyRequest().authenticated();
