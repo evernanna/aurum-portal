@@ -19,8 +19,8 @@
 
     <!-- package filter 가능 -->
     <logger name="com.zaxxer.hikari" level="ERROR"/>
-    <logger name="org.springframework.web" level="INFO"/>
-    <logger name="org.springframework.security" level="INFO"/>
+    <logger name="org.springframework.web" level="DEBUG"/>
+    <logger name="org.springframework.security" level="DEBUG"/>
 
     <!-- portal package debug -->
     <logger name="me.aurum" level="DEBUG"/>

@@ -17,9 +17,23 @@ spring:
         use_sql_comments: true
         default_batch_fetch_size: 1000
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate  #create-drop, update, validate, none
 
 # jwt.secret.key
 jwt:
   secret:
     salt: x!A%D*G-KaPdSgVkYp3s5v8y/B?E(H+M
+
+springdoc:
+  packages-to-scan: me.aurum
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    enabled: true
+    path: /aurum/swagger
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
+  api-docs:
+    enabled: true
+    path: /aurum/docs
