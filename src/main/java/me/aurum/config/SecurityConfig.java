@@ -6,21 +6,29 @@ import me.aurum.define.UserAuthority;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -37,10 +45,23 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .csrf().disable();
+        /*httpSecurity
+                .csrf().disable()
+                .cors(c -> {
+                            CorsConfigurationSource source = request -> {
+                                // Cors 허용 패턴
+                                CorsConfiguration config = new CorsConfiguration();
+                                config.setAllowedOrigins(Arrays.asList("*"));
+                                config.setAllowedMethods(Arrays.asList("*"));
+                                return config;
+                            };
+                            c.configurationSource(source);
+                        }
+                )
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);*/
 
         httpSecurity
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/login", "/signup").permitAll()
                 .antMatchers("/api/**").permitAll()
@@ -49,6 +70,26 @@ public class SecurityConfig {
                 .antMatchers("/master/**").hasRole(UserAuthority.ROLE_MASTER.getCode())
                 .antMatchers("/admin/**").hasRole(UserAuthority.ROLE_ADMIN.getCode())
                 .anyRequest().authenticated();
+
+        /*httpSecurity
+                //.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .accessDeniedHandler(
+                        (request, response, accessDeniedException) -> {
+                    // 권한 문제가 발생했을 때 이 부분을 호출한다.
+                    response.setStatus(403);
+                    response.setCharacterEncoding("utf-8");
+                    response.setContentType("text/html; charset=UTF-8");
+                    response.getWriter().write("권한이 없는 사용자입니다.");
+                })
+                .authenticationEntryPoint(
+                        (request, response, authException) -> {
+                    // 인증문제가 발생했을 때 이 부분을 호출한다.
+                    response.setStatus(401);
+                    response.setCharacterEncoding("utf-8");
+                    response.setContentType("text/html; charset=UTF-8");
+                    response.getWriter().write("인증되지 않은 사용자입니다.");
+                });*/
 
         httpSecurity
                 .formLogin() // Form Login 설정
@@ -70,12 +111,9 @@ public class SecurityConfig {
                             }
                         })
                 .failureHandler( // 로그인 실패 후 핸들러
-                        new AuthenticationFailureHandler() { // 익명 객체 사용
-                            @Override
-                            public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-                                log.error("Exception: {}", exception.getMessage());
-                                response.sendRedirect("/login");
-                            }
+                        (request, response, exception) -> {
+                            log.error("Exception: {}", exception.getMessage());
+                            response.sendRedirect("/login");
                         })
                 .and()
                 .logout();

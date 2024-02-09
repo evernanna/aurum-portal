@@ -28,7 +28,7 @@ public class HomeController {
         model.addAttribute("pageName", "세션 로그인");
         model.addAttribute("loginRequest", new LoginRequest());*/
 
-        return "login-form";
+        return "login-form2";
     }
 
     @GetMapping("/signup")
